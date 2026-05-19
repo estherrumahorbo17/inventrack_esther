@@ -16,11 +16,16 @@ class Item extends Model
         'deskripsi',
         'image',
         'users_id',
+        'category_id',
     ];
 
-    // Relasi: 1 Item dimiliki oleh (belongsTo) 1 User
-    public function user()
+    public function category()
     {
-        return $this->belongsTo(User::class, 'users_id');
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'item_supplier');
     }
 }

@@ -14,4 +14,9 @@ class Supplier extends Model
         'alamat',
         'image',
     ];
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'item_supplier');
+    }
 }

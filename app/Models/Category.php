@@ -11,4 +11,9 @@ class Category extends Model
         'deskripsi',
         'image',
     ];
+
+    public function items()
+    {
+        return $this->hasMany(Item::class, 'category_id');
+    }
 }
