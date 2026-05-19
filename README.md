@@ -1,58 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# InvenTrack — Sistem Inventaris Barang
+> **Ujian Tengah Semester (UTS) Praktikum Rekayasa Perangkat Lunak**
+> Universitas HKBP Nommensen
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 👤 Identitas Mahasiswa
+* **Nama Lengkap:** [NAMA LENGKAP ANDA]
+* **NIM:** [NIM ANDA]
+* **Kelas:** [KELAS ANDA]
+* **Program Studi:** Teknik Informatika / Sistem Informasi
+* **Dosen Pengampu:** [NAMA DOSEN ANDA]
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📝 Deskripsi Proyek
+**InvenTrack** adalah web aplikasi pengelolaan inventaris barang sederhana yang dirancang khusus untuk memenuhi penilaian praktikum Rekayasa Perangkat Lunak (RPL). Aplikasi ini dibangun menggunakan framework **Laravel 13** dan **Filament 5** admin panel.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini memudahkan Admin/Pengguna untuk melakukan pengelolaan data inventaris secara real-time, meliputi kategori barang, detail stok, lokasi penyimpanan, serta hubungan logistik dengan berbagai supplier/pemasok eksternal.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🗄️ Struktur Database & Relasi Tabel
+Sistem ini menggunakan database `db_inventrack` yang terdiri dari **4 tabel utama**:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```mermaid
+erDiagram
+    users ||--o{ items : "menambahkan (1 to many)"
+    categories ||--o{ items : "mengelompokkan (1 to many)"
+    items }|--|{ suppliers : "disediakan oleh (many to many)"
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+    users {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        timestamp created_at
+        timestamp updated_at
+    }
 
-## Agentic Development
+    categories {
+        bigint id PK
+        string nama_kategori
+        text deskripsi
+        text image
+        timestamp created_at
+        timestamp updated_at
+    }
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+    items {
+        bigint id PK
+        string nama_barang
+        string kode_barang UK
+        integer stok
+        integer harga
+        string kondisi
+        string lokasi
+        text deskripsi
+        text image
+        bigint category_id FK
+        bigint users_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
 
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+    suppliers {
+        bigint id PK
+        string nama_perusahaan
+        string nama_kontak
+        string telepon
+        string email
+        text alamat
+        text image
+        timestamp created_at
+        timestamp updated_at
+    }
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Penjelasan Relasi:
+1. **`users` ──── (1:N) ────> `items`**: Setiap admin (user) dapat menambahkan banyak barang ke dalam sistem. Kolom `users_id` pada tabel `items` terhubung ke `users.id` dengan relasi `cascadeOnDelete`.
+2. **`categories` ──── (1:N) ────> `items`**: Setiap barang dikelompokkan ke dalam satu kategori logistik (Elektronik, Furniture, ATK, dll.).
+3. **`items` ──── (N:M) ────> `suppliers`**: Relasi banyak-ke-banyak (Many-to-Many) antara barang dan supplier/pemasok menggunakan tabel pivot `item_supplier`.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Fitur Utama & Panduan CRUD Filament 5
+Aplikasi ini menyediakan halaman panel administrasi modern dengan antarmuka premium:
+* **Autentikasi Aman:** Dilengkapi login screen terintegrasi menggunakan middleware autentikasi bawaan Filament.
+* **Manajemen Kategori (Categories):** Pencarian, pengurutan, deskripsi visual, dan upload ikon kategori yang tersimpan rapi di disk `public`.
+* **Manajemen Barang (Items):**
+  * Input Kode Barang unik.
+  * Form numerik validatif untuk stok dan harga (dengan format mata uang Rupiah `IDR`).
+  * Dropdown kondisi fisik barang (`Baik`, `Rusak Ringan`, `Rusak Berat`) dengan penanda visual **Badge Berwarna** (*Success*, *Warning*, *Danger*).
+  * Dropdown lokasi gudang penyimpanan (`Gudang A`, `Gudang B`, `Gudang C`) dengan **Badge**.
+  * Pengisian otomatis `users_id` secara tersembunyi (*hidden*) berdasarkan akun yang sedang aktif login.
+* **Manajemen Supplier (Suppliers):** Data kontak lengkap perusahaan, email dengan format validatif, nomor telepon, alamat, dan logo perusahaan.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠️ Langkah Menjalankan Proyek Secara Lokal
 
-## Security Vulnerabilities
+### 1. Kloning Repository
+```bash
+git clone https://github.com/USERNAME/inventrack.git
+cd inventrack_esther
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 2. Install Dependensi
+```bash
+composer install
+```
 
-## License
+### 3. Konfigurasi Environment (`.env`)
+Salin file `.env.example` menjadi `.env` lalu sesuaikan kredensial database Anda:
+```env
+APP_NAME=InvenTrack
+APP_URL=http://localhost:8000
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_inventrack
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Buat Database & Jalankan Migrasi
+Pastikan web server lokal Anda (Herd/WAMP/XAMPP) aktif, buat database `db_inventrack`, lalu jalankan:
+```bash
+php artisan migrate
+```
+
+### 5. Generate Storage Symlink
+Hubungkan direktori penyimpanan gambar agar file upload dapat diakses secara publik:
+```bash
+php artisan storage:link
+```
+
+### 6. Buat Akun Admin Filament
+```bash
+php artisan make:filament-user
+# Masukkan Name: Admin
+# Masukkan Email: admin@admin.com
+# Masukkan Password: password
+```
+
+### 7. Jalankan Server Lokal
+```bash
+php artisan serve
+```
+Akses aplikasi melalui browser Anda pada URL: **`http://localhost:8000/admin/login`**
+
+---
+
+## 💾 Riwayat Git Commit
+Riwayat commit pada repository ini terstruktur secara rapi sesuai ketentuan penilaian UTS:
+1. `feat: initial project inventrack Laravel 13`
+2. `feat: create migrations for categories, items, suppliers`
+3. `feat: setup fillable and relationships`
+4. `feat: install Filament 5 and generate resources`
+5. `feat: customize all Filament resources`
+6. `docs: add academic README documentation`
+
+---
+
+## 📸 Dokumentasi Screenshot Pengumpulan
+Seluruh screenshot berikut dapat dilihat pada folder `screenshots/` di dalam root direktori proyek ini:
+1. **Welcome Screen Laravel** (`screenshots/1_welcome_page.png`)
+2. **Struktur Tabel Database Manager** (`screenshots/2_database_tables.png`)
+3. **Dashboard Panel Admin Filament** (`screenshots/3_filament_dashboard.png`)
+4. **Form Tambah Kategori** (`screenshots/4_create_category_form.png`)
+5. **Form Tambah Barang (Items)** (`screenshots/5_create_item_form.png`)
+6. **Tabel Daftar Barang** (`screenshots/6_items_list_table.png`)
+7. **Form Tambah Supplier** (`screenshots/7_create_supplier_form.png`)
