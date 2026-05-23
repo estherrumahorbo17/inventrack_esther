@@ -5,11 +5,11 @@
 ---
 
 ## 👤 Identitas Mahasiswa
-* **Nama Lengkap:** [NAMA LENGKAP ANDA]
-* **NIM:** [NIM ANDA]
-* **Kelas:** [KELAS ANDA]
-* **Program Studi:** Teknik Informatika / Sistem Informasi
-* **Dosen Pengampu:** [NAMA DOSEN ANDA]
+* **Nama Lengkap:** [Esther Laura Rumahorbo]
+* **NIM:** [2302050042]
+* **Kelas:** [RPL-3]
+* **Program Studi:** ilmu komputer
+* **Dosen Pengampu:** [Juni Ismail M. Kom.]
 
 ---
 
